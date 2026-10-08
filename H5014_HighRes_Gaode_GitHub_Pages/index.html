@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"><meta name="theme-color" content="#14233c">
+<title>H5014 蕲春幅 · 地质图叠加高德地图</title>
+<style>
+:root{--ink:#17223a;--navy:#182b46;--muted:#65758a;--blue:#2563eb;--bg:#fff;--line:#dce4ee;--shadow:0 14px 40px rgba(20,35,56,.2)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);overflow:hidden}button,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:default}
+#map{position:fixed;inset:0;touch-action:none;overflow:hidden;background:#dbe5ed;user-select:none;cursor:grab}#map.dragging{cursor:grabbing}.tile{position:absolute;width:256px;height:256px;pointer-events:none;will-change:transform}.tile.sat-road{z-index:2}.tiles{position:absolute;inset:0;pointer-events:none}.tiles.road{z-index:0}.tiles.satellite{z-index:0}.tiles.labels{z-index:1}#raster{position:absolute;z-index:3;pointer-events:none;max-width:none;transform-origin:top left}#markerLayer{position:absolute;z-index:5;inset:0;pointer-events:none}.marker{position:absolute;transform:translate(-50%,-100%);pointer-events:auto;cursor:pointer;white-space:nowrap;display:flex;align-items:center;flex-direction:column;gap:4px}.marker .pin{background:#2563eb;color:white;font-size:14px;font-weight:900;line-height:1;width:30px;height:30px;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 9px #0006;display:grid;place-items:center}.marker.green .pin{background:#16876e}.marker.gps .pin{background:#ff8b31}.marker .name{background:#fff;color:#1f3151;font-size:12px;font-weight:700;padding:5px 8px;border-radius:7px;box-shadow:0 2px 9px #0003;max-width:190px;overflow:hidden;text-overflow:ellipsis}.marker::after{content:"";width:0;height:0;border:7px solid transparent;border-top-color:#fff;margin-top:-5px}.marker.active .pin{outline:3px solid #ffbc55}#mapCross{position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;color:#1b3552;font-weight:700;opacity:0;transition:.2s}
+.header{position:fixed;z-index:20;top:12px;left:12px;display:flex;align-items:center;gap:10px;max-width:calc(100vw - 110px);padding:11px 16px;border:1px solid #ffffffb0;border-radius:14px;background:#ffffffef;box-shadow:var(--shadow);backdrop-filter:blur(12px)}.kicker{font-size:10px;letter-spacing:.15em;color:#5279a6;font-weight:800}.header h1{font-size:16px;margin:1px 0 0;letter-spacing:-.02em}.header p{margin:2px 0 0;color:var(--muted);font-size:11px}.pill{border-radius:8px;padding:4px 7px;font-size:10px;background:#eef4fb;color:#2355a2;font-weight:750}
+.side{position:fixed;top:110px;left:12px;z-index:20;width:307px;max-width:calc(100vw - 24px);max-height:calc(100vh - 130px);overflow:auto;border:1px solid #ffffffaf;background:#fffffff2;box-shadow:var(--shadow);border-radius:16px;backdrop-filter:blur(12px)}.section{padding:16px 17px;border-bottom:1px solid var(--line)}.section:last-child{border:0}.section h2{font-size:12px;letter-spacing:.06em;color:#75859b;margin:0 0 12px}.seg{display:flex;border-radius:10px;background:#eef2f8;padding:3px;gap:3px}.seg button{flex:1;padding:8px 6px;border:0;border-radius:8px;background:transparent;font-size:13px;font-weight:650;color:#5f7085}.seg button.selected{background:white;color:#174f9c;box-shadow:0 1px 5px #b1c2d34d}.one-line{display:flex;justify-content:space-between;align-items:center;gap:12px}.one-line label{font-size:13px;font-weight:650}#opacity{width:100%;accent-color:var(--blue);cursor:pointer}.hint{font-size:11px;color:var(--muted);line-height:1.55;margin:6px 0 0}.rowbtn{display:flex;gap:7px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#f8fbff;color:#254368;padding:9px 11px;border-radius:9px;font-size:12px;font-weight:700}.btn:hover{border-color:#a0b9e3;background:#eaf2ff}.btn.primary{background:#235fe4;border-color:#235fe4;color:#fff}.btn.primary:hover{background:#1a4fbd}.point{border:1px solid var(--line);padding:10px 11px;border-radius:10px;margin-top:8px;display:flex;gap:8px;align-items:center;cursor:pointer;background:white}.point:hover,.point.active{border-color:#7aa6f2;background:#f3f7ff}.point .dot{width:10px;height:10px;background:#2563eb;border-radius:50%;flex-shrink:0}.point .dot.green{background:#16876e}.point-title{font-size:13px;font-weight:700}.point-desc{font-size:11px;color:var(--muted);margin-top:3px}.point .arrow{margin-left:auto;color:#7593ad}#toast{position:fixed;z-index:60;left:50%;bottom:24px;transform:translateX(-50%);max-width:95vw;background:#16263ee9;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.2s}#toast.show{opacity:1}.tools{position:fixed;right:14px;top:14px;z-index:20;display:flex;flex-direction:column;gap:8px}.toolgroup{display:flex;flex-direction:column;background:#fff;box-shadow:var(--shadow);border-radius:11px;overflow:hidden;border:1px solid #e3eaf2}.tool{border:0;background:#fff;width:43px;height:43px;color:#315277;font-weight:750;font-size:21px}.tool+.tool{border-top:1px solid var(--line)}.tool:hover{background:#f0f6ff}.detail{position:fixed;z-index:30;bottom:18px;left:335px;width:min(390px,calc(100vw - 370px));background:#fffffff2;border:1px solid #ffffffa6;box-shadow:var(--shadow);backdrop-filter:blur(12px);padding:16px;border-radius:14px;display:none}.detail.show{display:block}.detail h2{margin:0 25px 7px 0;font-size:16px}.detail p{color:var(--muted);font-size:12px;line-height:1.6;margin:3px 0}.detail .close{position:absolute;right:11px;top:9px;border:0;background:transparent;font-size:23px;color:#65758a}.coordinates{padding:8px 11px;background:#f0f5fb;border-radius:9px;font-size:12px;margin:9px 0;line-height:1.9;font-variant-numeric:tabular-nums}.coordinates b{color:#194a90}.detail .rowbtn{margin-top:10px}
+.footer-note{position:fixed;z-index:8;right:12px;bottom:9px;font-size:10px;color:#213652;text-shadow:0 1px 5px white,0 1px 5px white;max-width:320px;text-align:right}#legendModal{position:fixed;z-index:50;inset:0;background:#0e1e37b8;display:none;align-items:center;justify-content:center;padding:22px}#legendModal.show{display:flex}.legend-card{width:min(900px,100%);max-height:94vh;display:flex;flex-direction:column;overflow:hidden;background:white;border-radius:16px;box-shadow:var(--shadow)}.legend-top{display:flex;align-items:center;justify-content:space-between;padding:10px 17px;border-bottom:1px solid var(--line)}.legend-top h2{margin:0;font-size:15px}.legend-view{overflow:auto;padding:10px;background:#f2f5f8}.legend-view img{width:100%;max-width:850px;height:auto;display:block;margin:auto;image-rendering:auto}.legend-close{background:#eef3fa;border:0;border-radius:9px;padding:7px 13px;color:#304666}
+#mobileToggle{display:none}.shift{display:grid;grid-template-columns:1fr 1fr;gap:10px}.shift label{font-size:11px;color:#65758a}.shift input{width:100%;margin-top:5px;border:1px solid #d3deed;border-radius:7px;padding:7px 8px;color:#253852}.attribution{position:fixed;bottom:0;right:0;background:#ffffffe0;color:#4e6075;font-size:9px;z-index:7;padding:2px 6px}
+@media(max-width:700px){.header{top:env(safe-area-inset-top,0px);left:8px;right:56px;max-width:none;padding:9px 12px}.header h1{font-size:14px}.header p{display:none}.header .pill{font-size:9px}.tools{right:8px;top:env(safe-area-inset-top,0px)}.tool{width:40px;height:40px}.side{top:auto;bottom:8px;left:8px;right:8px;width:auto;max-height:58vh;overflow:auto;border-radius:15px;transform:translateY(calc(100% - 53px));transition:transform .25s}.side.open{transform:translateY(0)}.side .section:first-child{padding-top:14px}.side .section:not(:first-child){padding-top:11px;padding-bottom:11px}.mobile-grip{display:block!important;text-align:center;font-size:12px;font-weight:700;color:#2a4a78;padding:14px;background:#f7fafe;border-bottom:1px solid var(--line);cursor:pointer}.detail{bottom:76px;left:8px;width:calc(100vw - 16px);padding:13px}.footer-note{display:none}.attribution{bottom:60px}.side.open~.attribution{display:none}}
+.mobile-grip{display:none}
+#raster{overflow:hidden}#rasterOverview{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;max-width:none}.geo-hi-tile{position:absolute;pointer-events:none;display:block;max-width:none}
+</style>
+</head>
+<body>
+<div id="map" role="application" aria-label="H5014 高德底图与地质图叠加，拖动平移，滚轮或双指缩放">
+ <div class="tiles" id="baseTiles"></div><div class="tiles labels" id="labelTiles"></div>
+ <div id="raster" aria-label="H5014 高清地质图图层"><img id="rasterOverview" src="./assets/H5014_GCJ02_overview.webp" alt="" draggable="false"></div>
+ <div id="markerLayer"></div><div id="mapCross">+</div>
+</div>
+<div class="header"><div><div class="kicker">FIELD GEOLOGY · MAP OVERLAY</div><h1>H5014 蕲春幅 <span class="pill">1 : 200,000</span></h1><p>大新屋组 / 陆坪野外地质调查 · 高德底图叠加</p></div></div>
+<div class="tools"><div class="toolgroup"><button class="tool" id="zoomIn" title="放大">+</button><button class="tool" id="zoomOut" title="缩小">−</button></div><div class="toolgroup"><button class="tool" id="locate" title="我的定位" style="font-size:18px">◎</button><button class="tool" id="full" title="查看整幅图" style="font-size:17px">⊡</button></div></div>
+<div class="side" id="side"><div class="mobile-grip" id="mobileGrip">☰ 图层与采样点 · 点按展开 / 收起</div>
+<div class="section"><h2>高德地图底图</h2><div class="seg"><button id="road" class="selected">标准地图</button><button id="sat">卫星影像</button></div>
+<div class="one-line" style="margin-top:15px"><label for="opacity">地质图透明度</label><strong id="opacityText" style="font-size:12px;color:#2055a5">65%</strong></div><input type="range" min="0" max="100" step="1" id="opacity" value="65">
+<div class="rowbtn" style="margin-top:10px"><button class="btn primary" id="toggleRaster">显示地质图</button><button class="btn" id="legendBtn">查看完整图例</button></div>
+<p class="hint">保持原始地层配色、断层、岩性符号及注记。栅格已按图框转换为GCJ-02并进行Web墨卡托校正。</p></div>
+<div class="section"><h2>采样点 · 点击定位</h2><div id="pointList"></div><div class="rowbtn" style="margin-top:12px"><button class="btn" id="downloadCSV">导出点位 CSV</button><button class="btn" id="reset">重置视图</button></div></div>
+<div class="section"><h2>图件微调（仅影响地质图层）</h2><div class="shift"><label>向东偏移（米）<input id="east" type="number" step="10" value="0" inputmode="decimal"></label><label>向北偏移（米）<input id="north" type="number" step="10" value="0" inputmode="decimal"></label></div>
+<p class="hint">原图基于图框刻度近似配准。通过卫星道路或明显地质地物特征核对后，可微调叠加位置。微调不修改采样点坐标。</p></div>
+<div class="section"><h2>原始地质图</h2><div class="rowbtn"><a class="btn" style="text-decoration:none" href="assets/H5014_original_full.webp" target="_blank">打开完整图幅</a><a class="btn" style="text-decoration:none" href="assets/georeference.json" download>配准参数</a></div><p class="hint">论文坐标按WGS84假定转换，原始图幅的实际投影参数待核验。本图仅用于采样规划，不能代替野外实测定位与矿山许可。</p></div>
+</div>
+<div class="detail" id="detail"><button class="close" id="closeDetail">×</button><h2 id="detailTitle"></h2><p id="detailDesc"></p><div class="coordinates" id="coords"></div><div class="rowbtn"><button class="btn primary" id="amapOpen">在高德 App 中打开</button><button class="btn" id="copyCoord">复制高德坐标</button></div></div>
+<div class="footer-note">高德瓦片底图 · H-50-14 原始地质图 · WGS84→GCJ-02 近似校正</div><div class="attribution">底图 © 高德地图 · 地质图来源：用户提供的公开版 H-50-14 图幅</div>
+<div id="legendModal"><div class="legend-card"><div class="legend-top"><h2>H-50-14 蕲春幅 · 原版图例</h2><button class="legend-close" id="legendClose">关闭 ✕</button></div><div class="legend-view"><img src="assets/H5014_legend.webp" alt="原版完整地质图例"></div></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+'use strict';
+// A no-library slippy map viewer. Gaode-compatible XYZ raster tiles use GCJ-02 coordinates.
+// Public tile URLs can change or be rate-limited; official commercial deployment should use AMap JS API with valid credentials.
+const CFG={
+ bounds:[115.0052382452605,29.997288491152855,116.0051702171812,30.664436451810023],
+ points:[
+  {id:'daxinwu',name:'大新屋组公路剖面底部',type:'论文GPS位置',description:'Prave et al. (2018), p.168 · 大新屋组与大别杂岩基底接触附近',wgs:[115.9458,30.3416],gcj:[115.9508018,30.3389519]},
+  {id:'luiping',name:'陆坪采石场',type:'邮件GPS位置',description:'Tony Prave 来信 · 采石场，与公路剖面底部不同地点',wgs:[115.95661667,30.31861667],gcj:[115.9616379,30.3159882]}
+ ]
+};
+const $=id=>document.getElementById(id);
+const map=$('map'),base=$('baseTiles'),labels=$('labelTiles'),raster=$('raster'),markers=$('markerLayer');
+let state={lon:115.9508018,lat:30.3389519,zoom:11,mode:'road',opacity:0.65,rasterOn:true,shiftE:0,shiftN:0,selected:null,gps:null};
+let tileCache=new Map(),pointerCache=new Map(),gesture=null,renderQueued=false,tileErrors=0,toastTid=null;
+function notify(s){const el=$('toast');el.textContent=s;el.classList.add('show');clearTimeout(toastTid);toastTid=setTimeout(()=>el.classList.remove('show'),3600)}
+function project(lon,lat,z){let scale=256*2**z;let rad=Math.min(85.051128,Math.max(-85.051128,lat))*Math.PI/180;return {x:(lon+180)/360*scale,y:(1-Math.log(Math.tan(rad)+1/Math.cos(rad))/Math.PI)/2*scale}}
+function unproject(x,y,z){let scale=256*2**z;let lon=x/scale*360-180;let n=Math.PI*(1-2*y/scale);return {lon,lat:Math.atan(Math.sinh(n))*180/Math.PI}}
+function recenterAround(px,py,z){let rect=map.getBoundingClientRect(),ox=px-rect.width/2,oy=py-rect.height/2;let c=project(state.lon,state.lat,state.zoom),focus=unproject(c.x+ox,c.y+oy,state.zoom);let n=project(focus.lon,focus.lat,z);let nc=unproject(n.x-ox,n.y-oy,z);state.zoom=z;state.lon=nc.lon;state.lat=nc.lat;requestRender()}
+function zoomBy(step,x=null,y=null){const rect=map.getBoundingClientRect();recenterAround(x??rect.width/2,y??rect.height/2,Math.max(6,Math.min(19,state.zoom+step)))}
+function requestRender(){if(renderQueued)return;renderQueued=true;requestAnimationFrame(()=>{renderQueued=false;render()})}
+function tileURL(what,x,y,z){const sub=1+(Math.abs(x*7+y*11)%4);return what==='sat' ? `https://webst0${sub}.is.autonavi.com/appmaptile?style=6&x=${x}&y=${y}&z=${z}` : what==='labels' ? `https://webst0${sub}.is.autonavi.com/appmaptile?style=8&x=${x}&y=${y}&z=${z}` : `https://webrd0${sub}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x=${x}&y=${y}&z=${z}`;}
+function renderTiles(layer,name,cx,cy,w,h,z){let minX=Math.floor((cx-w/2)/256),maxX=Math.floor((cx+w/2)/256),minY=Math.floor((cy-h/2)/256),maxY=Math.floor((cy+h/2)/256);let wanted=new Set();let n=2**z;for(let xx=minX;xx<=maxX;xx++)for(let yy=minY;yy<=maxY;yy++){
+ if(yy<0||yy>=n)continue;let wrapped=(xx%n+n)%n,key=`${name}:${z}:${xx}:${yy}`;wanted.add(key);let e=tileCache.get(key);if(!e){e=new Image();e.className='tile'+(name==='labels'?' sat-road':'');e.alt='';e.decoding='async';e.draggable=false;e.src=tileURL(name,wrapped,yy,z);e.onerror=()=>{tileErrors++;if(tileErrors===6)notify('高德在线地图瓦片加载失败。请检查网络，或改用高德开放平台官方 JS API Key。')};tileCache.set(key,e);layer.appendChild(e)}
+ e.style.left=`${Math.round(xx*256-cx+w/2)}px`;e.style.top=`${Math.round(yy*256-cy+h/2)}px`;
+ }
+ for(const [key,e] of tileCache){if(key.startsWith(name+':')&&!wanted.has(key)){e.remove();tileCache.delete(key)}}
+}
+function clearTiles(){for(const e of tileCache.values())e.remove();tileCache.clear()}
+function shiftDegrees(){let rad=(30.3*Math.PI/180);return {x:state.shiftE/(111320*Math.cos(rad)),y:state.shiftN/111320}}
+function getScreenPoint(lon,lat,center,w,h){let p=project(lon,lat,state.zoom);return {x:p.x-center.x+w/2,y:p.y-center.y+h/2}}
+const hiTiles=new Map();
+const HI={width:5632,height:4352,tileSize:1024};
+function renderHiTiles(nw,se,w,h){
+ const sw=se.x-nw.x, sh=se.y-nw.y;
+ const overview=$('rasterOverview');
+ if(state.zoom<12 || sw<=0 || sh<=0 || nw.x>=w || se.x<=0 || nw.y>=h || se.y<=0){
+   overview.style.display='block';
+   for(const [key,im] of hiTiles){im.remove();hiTiles.delete(key)}
+   return;
+ }
+ overview.style.display='block';
+ const loX=Math.max(0,Math.floor((0-nw.x)/sw*HI.width/HI.tileSize)-1);
+ const hiX=Math.min(Math.ceil(HI.width/HI.tileSize)-1,Math.floor((w-nw.x)/sw*HI.width/HI.tileSize)+1);
+ const loY=Math.max(0,Math.floor((0-nw.y)/sh*HI.height/HI.tileSize)-1);
+ const hiY=Math.min(Math.ceil(HI.height/HI.tileSize)-1,Math.floor((h-nw.y)/sh*HI.height/HI.tileSize)+1);
+ const desired=new Set();
+ for(let j=loY;j<=hiY;j++) for(let i=loX;i<=hiX;i++){
+  const key=`${i}_${j}`;desired.add(key);
+  let im=hiTiles.get(key);
+  if(!im){im=new Image();im.className='geo-hi-tile';im.decoding='async';im.draggable=false;im.src=`./assets/tiles/tile_${i}_${j}.webp`;hiTiles.set(key,im);raster.appendChild(im)}
+  const left=i*HI.tileSize/HI.width*100,top=j*HI.tileSize/HI.height*100;
+  const width=Math.min(HI.tileSize,HI.width-i*HI.tileSize)/HI.width*100;
+  const height=Math.min(HI.tileSize,HI.height-j*HI.tileSize)/HI.height*100;
+  im.style.left=left+'%';im.style.top=top+'%';im.style.width=width+'%';im.style.height=height+'%';
+ }
+ for(const [key,im] of hiTiles)if(!desired.has(key)){im.remove();hiTiles.delete(key)}
+}
+function render(){let rect=map.getBoundingClientRect(),w=rect.width,h=rect.height,z=state.zoom,c=project(state.lon,state.lat,z);
+ renderTiles(base,state.mode==='road'?'road':'sat',c.x,c.y,w,h,z);
+ if(state.mode==='sat'){labels.style.display='block';renderTiles(labels,'labels',c.x,c.y,w,h,z)}else {labels.style.display='none';for(const [key,e] of tileCache)if(key.startsWith('labels:')){e.remove();tileCache.delete(key)}}
+ let b=CFG.bounds,delta=shiftDegrees(),nw=getScreenPoint(b[0]+delta.x,b[3]+delta.y,c,w,h),se=getScreenPoint(b[2]+delta.x,b[1]+delta.y,c,w,h);
+ raster.style.left=nw.x+'px';raster.style.top=nw.y+'px';raster.style.width=(se.x-nw.x)+'px';raster.style.height=(se.y-nw.y)+'px';raster.style.opacity=state.rasterOn?state.opacity:0; renderHiTiles(nw,se,w,h);
+ for(let p of CFG.points){let el=$('marker_'+p.id);let pt=getScreenPoint(p.gcj[0],p.gcj[1],c,w,h);el.style.left=pt.x+'px';el.style.top=pt.y+'px';el.style.display=(pt.x<-100||pt.x>w+100||pt.y<-100||pt.y>h+100)?'none':'flex';el.classList.toggle('active',p.id===state.selected?.id)}
+ if(state.gps){let el=$('marker_gps');if(!el){el=document.createElement('div');el.id='marker_gps';el.className='marker gps';el.innerHTML='<span class="name">我的位置</span><span class="pin">◎</span>';markers.appendChild(el)}let pt=getScreenPoint(...state.gps,c,w,h);el.style.left=pt.x+'px';el.style.top=pt.y+'px'}
+}
+function selectPoint(p){state.selected=p;state.lon=p.gcj[0];state.lat=p.gcj[1];state.zoom=Math.max(12,state.zoom);$('detailTitle').textContent=p.name;$('detailDesc').textContent=p.description;
+ $('coords').innerHTML=`<b>高德 GCJ-02</b> ${p.gcj[1].toFixed(6)}°N, ${p.gcj[0].toFixed(6)}°E<br><b>原始 GPS</b> ${p.wgs[1].toFixed(6)}°N, ${p.wgs[0].toFixed(6)}°E`;
+ $('detail').classList.add('show');document.querySelectorAll('.point').forEach(el=>el.classList.toggle('active',el.dataset.id===p.id));requestRender();if(window.innerWidth<=700)$('side').classList.remove('open');}
+for(let p of CFG.points){let li=document.createElement('div');li.className='point';li.dataset.id=p.id;li.innerHTML=`<span class="dot ${p.id==='luiping'?'green':''}"></span><span><div class="point-title">${p.name}</div><div class="point-desc">${p.type}</div></span><span class="arrow">→</span>`;li.addEventListener('click',()=>selectPoint(p));$('pointList').appendChild(li);
+ let el=document.createElement('div');el.className='marker '+(p.id==='luiping'?'green':'');el.id='marker_'+p.id;el.innerHTML='<span class="name"></span><span class="pin">'+(p.id==='luiping'?'2':'1')+'</span>';el.querySelector('.name').textContent=p.name;el.addEventListener('click',e=>{e.stopPropagation();selectPoint(p)});markers.appendChild(el)}
+function fit(){let rect=map.getBoundingClientRect(),b=CFG.bounds,centerLon=(b[0]+b[2])/2,centerLat=(b[1]+b[3])/2;let z=12;for(;z>=6;z--){let nw=project(b[0],b[3],z),se=project(b[2],b[1],z);if(se.x-nw.x<rect.width*.78&&se.y-nw.y<rect.height*.78)break}state.lon=centerLon;state.lat=centerLat;state.zoom=z;requestRender()}
+function loc(){if(!navigator.geolocation){notify('当前浏览器不支持定位');return}navigator.geolocation.getCurrentPosition(pos=>{const [lng,lat]=wgs84ToGcj02(pos.coords.longitude,pos.coords.latitude);state.lon=lng;state.lat=lat;state.zoom=14;state.gps=[lng,lat];notify('已定位，定位精度约 '+Math.round(pos.coords.accuracy)+' 米');requestRender()},err=>notify('定位失败：请使用 HTTPS 并允许浏览器定位权限'),{enableHighAccuracy:true,timeout:14000,maximumAge:6000})}
+// WGS84 to GCJ02 for user geolocation; same standard approximate transformation as preprocessing.
+function deltaLat(x,y){return -100+2*x+3*y+.2*y*y+.1*x*y+.2*Math.sqrt(Math.abs(x))+(20*Math.sin(6*x*Math.PI)+20*Math.sin(2*x*Math.PI))*2/3+(20*Math.sin(y*Math.PI)+40*Math.sin(y/3*Math.PI))*2/3+(160*Math.sin(y/12*Math.PI)+320*Math.sin(y*Math.PI/30))*2/3}
+function deltaLon(x,y){return 300+x+2*y+.1*x*x+.1*x*y+.1*Math.sqrt(Math.abs(x))+(20*Math.sin(6*x*Math.PI)+20*Math.sin(2*x*Math.PI))*2/3+(20*Math.sin(x*Math.PI)+40*Math.sin(x/3*Math.PI))*2/3+(150*Math.sin(x/12*Math.PI)+300*Math.sin(x/30*Math.PI))*2/3}
+function wgs84ToGcj02(lon,lat){if(lon<72.004||lon>137.8347||lat<.8293||lat>55.8271)return [lon,lat];let x=lon-105,y=lat-35,phi=lat*Math.PI/180,mag=1-0.00669342162296594323*Math.sin(phi)**2,s=Math.sqrt(mag),dlat=deltaLat(x,y)*180/(6378245*(1-0.00669342162296594323)/(mag*s)*Math.PI),dlon=deltaLon(x,y)*180/(6378245/s*Math.cos(phi)*Math.PI);return [lon+dlon,lat+dlat]}
+function updateOpacity(){state.opacity=Number($('opacity').value)/100;$('opacityText').textContent=$('opacity').value+'%';requestRender()}
+$('opacity').addEventListener('input',updateOpacity);$('toggleRaster').onclick=()=>{state.rasterOn=!state.rasterOn;$('toggleRaster').textContent=state.rasterOn?'显示地质图':'已隐藏地质图';$('toggleRaster').classList.toggle('primary',state.rasterOn);requestRender()};
+$('road').onclick=()=>{state.mode='road';$('road').classList.add('selected');$('sat').classList.remove('selected');clearTiles();requestRender()};
+$('sat').onclick=()=>{state.mode='sat';$('sat').classList.add('selected');$('road').classList.remove('selected');clearTiles();requestRender()};
+$('zoomIn').onclick=()=>zoomBy(1);$('zoomOut').onclick=()=>zoomBy(-1);$('full').onclick=fit;$('locate').onclick=loc;
+$('closeDetail').onclick=()=>{state.selected=null;$('detail').classList.remove('show');document.querySelectorAll('.point').forEach(e=>e.classList.remove('active'));requestRender()};
+$('amapOpen').onclick=()=>{if(!state.selected)return;let p=state.selected;window.open(`https://uri.amap.com/marker?position=${p.gcj[0]},${p.gcj[1]}&name=${encodeURIComponent(p.name)}&coordinate=gaode&callnative=1`,'_blank','noopener')};
+$('copyCoord').onclick=()=>{if(!state.selected)return;let p=state.selected;navigator.clipboard?.writeText(`${p.gcj[1]},${p.gcj[0]}`).then(()=>notify('已复制高德 GCJ-02 坐标')).catch(()=>notify('请长按坐标文字复制'))};
+$('legendBtn').onclick=()=>$('legendModal').classList.add('show');$('legendClose').onclick=()=>$('legendModal').classList.remove('show');$('legendModal').onclick=e=>{if(e.target.id==='legendModal')$('legendModal').classList.remove('show')};
+$('reset').onclick=()=>{state.shiftE=state.shiftN=0;$('east').value=$('north').value=0;state.selected=null;$('detail').classList.remove('show');fit()};
+for(const [id,k] of [['east','shiftE'],['north','shiftN']])$(id).addEventListener('input',()=>{state[k]=Math.max(-5000,Math.min(5000,Number($(id).value)||0));requestRender()});
+$('mobileGrip').onclick=()=>$('side').classList.toggle('open');
+$('downloadCSV').onclick=()=>{let lines=['名称,来源,原始WGS84纬度,原始WGS84经度,高德GCJ02纬度,高德GCJ02经度'];for(const p of CFG.points)lines.push([p.name,p.type,p.wgs[1],p.wgs[0],p.gcj[1],p.gcj[0]].join(','));let blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});let link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='H5014_Luiping_sampling_points.csv';link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000)};
+let ignoreTap=false;
+function midpoint(items){let a=[...items.values()];return {x:a.reduce((s,q)=>s+q.x,0)/a.length,y:a.reduce((s,q)=>s+q.y,0)/a.length}}
+function distance(items){let a=[...items.values()];return Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}
+map.addEventListener('pointerdown',e=>{if(e.target.closest('.marker'))return;map.setPointerCapture(e.pointerId);pointerCache.set(e.pointerId,{x:e.clientX,y:e.clientY});let c=project(state.lon,state.lat,state.zoom);gesture={center:c,startPoints:new Map(pointerCache),zoom:state.zoom,oldDist:pointerCache.size>1?distance(pointerCache):null};map.classList.add('dragging')});
+map.addEventListener('pointermove',e=>{if(!pointerCache.has(e.pointerId))return;pointerCache.set(e.pointerId,{x:e.clientX,y:e.clientY});if(!gesture)return;let start=midpoint(gesture.startPoints),now=midpoint(pointerCache);if(pointerCache.size>=2&&gesture.startPoints.size>=2){let dist=distance(pointerCache);let factor=dist/Math.max(1,gesture.oldDist);let step=Math.log2(factor);if(Math.abs(step)>.25){let newz=Math.max(6,Math.min(19,Math.round(gesture.zoom+step)));let rect=map.getBoundingClientRect();let o=now;let c=unproject(gesture.center.x-(o.x-start.x),gesture.center.y-(o.y-start.y),gesture.zoom);state.lon=c.lon;state.lat=c.lat;if(newz!==state.zoom)recenterAround(now.x-rect.left,now.y-rect.top,newz);requestRender()}else{let c=unproject(gesture.center.x-(now.x-start.x),gesture.center.y-(now.y-start.y),state.zoom);state.lon=c.lon;state.lat=c.lat;requestRender()}}else if(pointerCache.size===1&&gesture.startPoints.size===1){let c=unproject(gesture.center.x-(now.x-start.x),gesture.center.y-(now.y-start.y),gesture.zoom);state.lon=c.lon;state.lat=c.lat;requestRender()}});
+function pointerUp(e){pointerCache.delete(e.pointerId);if(pointerCache.size){let c=project(state.lon,state.lat,state.zoom);gesture={center:c,startPoints:new Map(pointerCache),zoom:state.zoom,oldDist:pointerCache.size>1?distance(pointerCache):null}}else{gesture=null;map.classList.remove('dragging')}};
+map.addEventListener('pointerup',pointerUp);map.addEventListener('pointercancel',pointerUp);
+map.addEventListener('wheel',e=>{e.preventDefault();let r=map.getBoundingClientRect();zoomBy(e.deltaY<0?1:-1,e.clientX-r.left,e.clientY-r.top)},{passive:false});
+map.addEventListener('dblclick',e=>{e.preventDefault();let r=map.getBoundingClientRect();zoomBy(1,e.clientX-r.left,e.clientY-r.top)});
+window.addEventListener('resize',requestRender);
+fit();selectPoint(CFG.points[0]);
+</script>
+</body>
+</html>

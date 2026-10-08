@@ -1,0 +1,82 @@
+{
+  "name": "H-50-14 蕲春幅 1:20万区域地质图",
+  "original_file": "H5014.TIF (10204×5567 px, 300 dpi)",
+  "geographic_bounds_WGS84_assumed": [
+    115.0,
+    30.0,
+    116.0,
+    30.666666666666668
+  ],
+  "image_geolocation_source": "图框刻度: 左上(115E,30°40N),右上(116E,30°40N), 左下(115E,30N),右下(116E,30N)",
+  "geo_to_image_quad_pixels": {
+    "top_left": [
+      35,
+      154
+    ],
+    "top_right": [
+      1170,
+      154
+    ],
+    "bottom_left": [
+      30,
+      1030
+    ],
+    "bottom_right": [
+      1174,
+      1030
+    ]
+  },
+  "overlay_bounds_GCJ02": [
+    115.0052382452605,
+    29.997288491152855,
+    116.0051702171812,
+    30.664436451810023
+  ],
+  "image_geo_projection": "GCJ-02 Web Mercator; affine approximation from printed 1:200,000 neatline",
+  "points": [
+    {
+      "id": "daxinwu",
+      "name": "大新屋组公路剖面底部",
+      "source": "Prave et al. (2018), p. 168",
+      "type": "论文坐标",
+      "wgs": [
+        115.9458,
+        30.3416
+      ],
+      "gcj": [
+        115.9508018,
+        30.3389519
+      ]
+    },
+    {
+      "id": "luiping",
+      "name": "陆坪采石场",
+      "source": "Tony Prave 邮件，30°19.117′N 115°57.397′E",
+      "type": "邮件坐标",
+      "wgs": [
+        115.95661667,
+        30.31861667
+      ],
+      "gcj": [
+        115.9616379,
+        30.3159882
+      ]
+    }
+  ],
+  "limitations": "图框四角近似配准，原分幅投影未知；GPS被假定为WGS84并换算GCJ-02。非测量级精度。",
+  "source_image_pixels": [
+    10204,
+    5567
+  ],
+  "converted_image_pixels": [
+    5632,
+    4352
+  ],
+  "raster_tiles": {
+    "directory": "assets/tiles",
+    "tile_size": 1024,
+    "columns": 6,
+    "rows": 5,
+    "format": "lossless WebP"
+  }
+}

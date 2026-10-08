@@ -1,0 +1,35 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "大新屋组公路剖面底部",
+        "source": "Prave et al. (2018), p. 168",
+        "coordinate_system": "WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.9458,
+          30.3416
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "陆坪采石场",
+        "source": "Tony Prave 邮件，30°19.117′N 115°57.397′E",
+        "coordinate_system": "WGS84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.95661667,
+          30.31861667
+        ]
+      }
+    }
+  ]
+}
