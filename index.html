@@ -15,6 +15,7 @@
 .mobile-grip{display:none}
 #raster{overflow:hidden}#rasterOverview{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;max-width:none}.geo-hi-tile{position:absolute;pointer-events:none;display:block;max-width:none}
 </style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div id="map" role="application" aria-label="H5014 高德底图与地质图叠加，拖动平移，滚轮或双指缩放">
@@ -23,20 +24,63 @@
  <div id="markerLayer"></div><div id="mapCross">+</div>
 </div>
 <div class="header"><div><div class="kicker">FIELD GEOLOGY · MAP OVERLAY</div><h1>H5014 蕲春幅 <span class="pill">1 : 200,000</span></h1><p>大新屋组 / 陆坪野外地质调查 · 高德底图叠加</p></div></div>
+<div id="quickbar" role="toolbar" aria-label="野外地质图工具栏">
+ <button id="btnMenu" type="button">☰ 图层</button>
+ <button id="btnBase" type="button">卫星图</button>
+ <button id="btnLocate" type="button">◎ 定位</button>
+ <button id="btnNew" type="button">＋ 新增样点</button>
+ <button id="btnAtlas" type="button">▣ 完整图幅</button>
+</div>
 <div class="tools"><div class="toolgroup"><button class="tool" id="zoomIn" title="放大">+</button><button class="tool" id="zoomOut" title="缩小">−</button></div><div class="toolgroup"><button class="tool" id="locate" title="我的定位" style="font-size:18px">◎</button><button class="tool" id="full" title="查看整幅图" style="font-size:17px">⊡</button></div></div>
-<div class="side" id="side"><div class="mobile-grip" id="mobileGrip">☰ 图层与采样点 · 点按展开 / 收起</div>
-<div class="section"><h2>高德地图底图</h2><div class="seg"><button id="road" class="selected">标准地图</button><button id="sat">卫星影像</button></div>
-<div class="one-line" style="margin-top:15px"><label for="opacity">地质图透明度</label><strong id="opacityText" style="font-size:12px;color:#2055a5">65%</strong></div><input type="range" min="0" max="100" step="1" id="opacity" value="65">
-<div class="rowbtn" style="margin-top:10px"><button class="btn primary" id="toggleRaster">显示地质图</button><button class="btn" id="legendBtn">查看完整图例</button></div>
-<p class="hint">保持原始地层配色、断层、岩性符号及注记。栅格已按图框转换为GCJ-02并进行Web墨卡托校正。</p></div>
-<div class="section"><h2>采样点 · 点击定位</h2><div id="pointList"></div><div class="rowbtn" style="margin-top:12px"><button class="btn" id="downloadCSV">导出点位 CSV</button><button class="btn" id="reset">重置视图</button></div></div>
-<div class="section"><h2>图件微调（仅影响地质图层）</h2><div class="shift"><label>向东偏移（米）<input id="east" type="number" step="10" value="0" inputmode="decimal"></label><label>向北偏移（米）<input id="north" type="number" step="10" value="0" inputmode="decimal"></label></div>
-<p class="hint">原图基于图框刻度近似配准。通过卫星道路或明显地质地物特征核对后，可微调叠加位置。微调不修改采样点坐标。</p></div>
-<div class="section"><h2>原始地质图</h2><div class="rowbtn"><a class="btn" style="text-decoration:none" href="assets/H5014_original_full.webp" target="_blank">打开完整图幅</a><a class="btn" style="text-decoration:none" href="assets/georeference.json" download>配准参数</a></div><p class="hint">论文坐标按WGS84假定转换，原始图幅的实际投影参数待核验。本图仅用于采样规划，不能代替野外实测定位与矿山许可。</p></div>
+<div class="side open" id="side">
+ <div class="mobile-grip" id="mobileGrip">☰ 图层与野外采样 · 点按收起 / 展开</div>
+ <div class="panelHead"><b>H-50-14 蕲春幅 · 原版地质图</b><button id="btnCloseSide" type="button" aria-label="关闭面板">×</button></div>
+ <div class="tabs" role="tablist"><button class="tab active" data-tab="layers" type="button">图层</button><button class="tab" data-tab="search" type="button">搜索</button><button class="tab" data-tab="info" type="button">属性</button><button class="tab" data-tab="samples" type="button">样点</button><button class="tab" data-tab="about" type="button">说明</button></div>
+ <section class="tabBody active" id="tab-layers">
+  <div class="section"><h2>高德底图</h2><div class="seg"><button id="road" class="selected" type="button">标准地图</button><button id="sat" type="button">卫星影像</button></div></div>
+  <div class="section"><h2>H5014 原版地质图层</h2>
+   <div class="one-line"><label for="opacity">叠加透明度</label><strong id="opacityText">65%</strong></div><input type="range" min="0" max="100" step="1" id="opacity" value="65">
+   <div class="rowbtn"><button class="btn primary" id="toggleRaster" type="button">显示地质图</button><button class="btn" id="legendBtn" type="button">原版图例</button></div>
+   <p class="hint">保留 TIFF 原图地层配色、岩性符号、断层及文字。地图缩放时按需读取无损高清瓦片。</p>
+  </div>
+  <div class="section"><h2>图幅控制</h2><div class="rowbtn"><button class="btn primary" id="openFullMap" type="button">查看完整高清图幅</button><button class="btn" id="reset" type="button">重置地图</button></div>
+   <div class="rowbtn" style="margin-top:8px"><a class="btn" href="assets/H5014_original_full.webp" target="_blank" rel="noopener">浏览器单独打开原图 ↗</a></div>
+  </div>
+  <div class="section"><h2>图层位置微调</h2><div class="shift"><label>向东（米）<input id="east" type="number" value="0" step="10" inputmode="decimal"></label><label>向北（米）<input id="north" type="number" value="0" step="10" inputmode="decimal"></label></div>
+   <p class="hint">依据图框近似配准，微调仅改变图层显示位置，不修改采样点。</p>
+  </div>
+ </section>
+ <section class="tabBody" id="tab-search"><div class="section"><h2>检索采样点</h2><input id="searchInput" placeholder="大新屋组、陆坪、样点编号……"><button id="searchBtn" class="btn primary wide" type="button">搜索点位</button><div id="searchResults"></div><p class="hint">当前可搜索预置点及自行添加的样点；原始地质图是栅格图，尚不支持按地层属性检索。</p></div></section>
+ <section class="tabBody" id="tab-info"><div class="section"><h2>点位属性</h2><div id="attributeInfo" class="hint">选择地图上的采样点查看位置、来源和坐标。</div></div></section>
+ <section class="tabBody" id="tab-samples">
+  <div class="section"><h2>论文与邮件点位</h2><div id="pointList"></div></div>
+  <div class="section"><h2>自采样点</h2><div class="rowbtn"><button class="btn primary" id="panelAddSample" type="button">＋ 按地图中心新增</button><button class="btn" id="clearCustom" type="button">清除自采点</button></div><div id="customSampleList"></div></div>
+  <div class="section"><h2>导出野外记录</h2><div class="rowbtn"><button class="btn" id="downloadCSV" type="button">导出 CSV</button><button class="btn" id="downloadGeoJSON" type="button">导出 GeoJSON</button></div><p class="hint">导出的 GCJ-02 坐标适合高德显示，不能当作未经转换的 GPS/WGS84 数据。</p></div>
+ </section>
+ <section class="tabBody" id="tab-about"><div class="section"><h2>数据与使用说明</h2>
+  <p>地质图：1:20万 H-50-14 蕲春幅，使用上传的 H5014.TIF 制作高清 WebP 地图瓦片。</p>
+  <p>参考：Prave et al. (2018) 第168页大新屋组公路剖面底部，另包含 Tony Prave 邮件提供的陆坪采石场。</p>
+  <p>坐标：原始论文坐标按 WGS84 假设转换为高德 GCJ-02；图层配准尚需野外控制点验证。</p>
+  <p>地图图像不可单独编辑地质单位或识别图中任意岩性；采样点可以新增和导出。</p>
+  <div class="rowbtn"><a class="btn" href="assets/georeference.json" download>配准信息 JSON</a><button class="btn" type="button" id="aboutFullMap">查看完整图幅</button></div>
+ </div></section>
 </div>
 <div class="detail" id="detail"><button class="close" id="closeDetail">×</button><h2 id="detailTitle"></h2><p id="detailDesc"></p><div class="coordinates" id="coords"></div><div class="rowbtn"><button class="btn primary" id="amapOpen">在高德 App 中打开</button><button class="btn" id="copyCoord">复制高德坐标</button></div></div>
 <div class="footer-note">高德瓦片底图 · H-50-14 原始地质图 · WGS84→GCJ-02 近似校正</div><div class="attribution">底图 © 高德地图 · 地质图来源：用户提供的公开版 H-50-14 图幅</div>
 <div id="legendModal"><div class="legend-card"><div class="legend-top"><h2>H-50-14 蕲春幅 · 原版图例</h2><button class="legend-close" id="legendClose">关闭 ✕</button></div><div class="legend-view"><img src="assets/H5014_legend.webp" alt="原版完整地质图例"></div></div></div>
+<div id="fullMapModal" class="atlasModal" role="dialog" aria-modal="true" aria-label="H5014 高清完整图幅" hidden>
+ <div class="atlasPanel"><div class="atlasHead"><b>H5014 蕲春幅 · 完整原版地质图与图例</b><span>滑动查看 · 双指或按钮缩放</span><button type="button" id="closeFullMap">关闭 ×</button></div>
+ <div class="atlasActions"><button type="button" id="atlasMinus">− 缩小</button><button type="button" id="atlasFit">适合窗口</button><button type="button" id="atlasPlus">＋ 放大</button><a href="assets/H5014_original_full.webp" target="_blank" rel="noopener">单独打开高清原图 ↗</a></div>
+ <div id="atlasViewport"><img id="atlasImage" alt="H5014 1:20万完整地质图（包括图框及完整图例）" loading="lazy" draggable="false"></div>
+ <div id="atlasStatus">完整图幅读取中…</div></div>
+</div>
+<div id="newSampleModal" class="sampleModal" role="dialog" aria-modal="true" aria-label="新增采样点" hidden>
+ <form id="newSampleForm" class="samplePanel"><h2>新增野外采样点</h2><p id="samplePosition" class="hint"></p>
+ <label>样点编号<input id="sampleName" required maxlength="50" placeholder="如 DXW-01"></label>
+ <label>岩性 / 样品类型<input id="sampleRock" maxlength="120" placeholder="石墨片岩、大理岩……"></label>
+ <label>备注<textarea id="sampleNote" rows="3" maxlength="800" placeholder="接触关系、蚀变、脉体等"></textarea></label>
+ <div class="rowbtn"><button type="button" class="btn" id="cancelSample">取消</button><button type="submit" class="btn primary">保存样点</button></div></form>
+</div>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
 'use strict';
@@ -138,7 +182,8 @@ map.addEventListener('pointerup',pointerUp);map.addEventListener('pointercancel'
 map.addEventListener('wheel',e=>{e.preventDefault();let r=map.getBoundingClientRect();zoomBy(e.deltaY<0?1:-1,e.clientX-r.left,e.clientY-r.top)},{passive:false});
 map.addEventListener('dblclick',e=>{e.preventDefault();let r=map.getBoundingClientRect();zoomBy(1,e.clientX-r.left,e.clientY-r.top)});
 window.addEventListener('resize',requestRender);
-fit();selectPoint(CFG.points[0]);
+fit();
 </script>
+<script src="./app-extra.js"></script>
 </body>
 </html>
