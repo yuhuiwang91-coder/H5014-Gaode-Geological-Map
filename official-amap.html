@@ -1,0 +1,26 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#17345f"><title>H5014 × 高德 JS API 官方模式</title><style>
+*{box-sizing:border-box}body{margin:0;color:#152d4c;font:14px system-ui,"Microsoft YaHei",sans-serif}#map{position:fixed;inset:0;background:#ecf1f7}#setup{position:fixed;z-index:8;inset:0;background:#203856bd;display:flex;align-items:center;justify-content:center;padding:18px}#setup form{background:#fff;max-width:500px;width:100%;padding:26px;border-radius:16px;box-shadow:0 15px 45px #0004}h2{margin:0 0 12px;font-size:19px}.muted{font-size:12px;color:#697e97;line-height:1.65}.field{margin-top:12px}.field label{display:block;font-weight:700;margin:0 0 5px}.field input{width:100%;border:1px solid #cbd6e6;padding:11px 12px;border-radius:8px}button{border:0;background:#235fe4;color:#fff;padding:11px 14px;border-radius:9px;font:inherit;font-weight:700;cursor:pointer}.toolbar{position:fixed;z-index:4;top:12px;left:12px;max-width:calc(100vw - 24px);width:350px;background:#fffc;border-radius:14px;padding:14px;box-shadow:0 10px 25px #0003}.toolbar h2{font-size:15px;margin-bottom:8px}.line{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:10px}.line button{padding:8px 9px;font-size:12px}.line input{accent-color:#235fe4;flex:1}.warn{color:#a44b0d}#err{font-size:12px;color:#bb3636;margin-top:8px}.hidden{display:none!important}
+</style></head><body><div id="map"></div>
+<div class="toolbar hidden" id="ui"><h2>H5014 · 蕲春幅 1:20万</h2><div class="line"><button id="road">标准</button><button id="sat">卫星</button><button id="fit">查看全图</button><button id="legend">图例</button></div><div class="line">透明度 <input id="opacity" type="range" min="0" max="100" value="65"><span id="label">65%</span></div><div class="line"><button id="daxinwu">大新屋组公路剖面</button><button id="luiping">陆坪采石场</button></div><div class="muted">本模式使用官方 AMap.ImageLayer 和 JS API，需自备高德开放平台 Web端（JS API）Key 与安全密钥。页面不储存密钥。</div></div>
+<div id="setup"><form id="keyform"><h2>官方高德地图 · 图层叠加</h2><p class="muted">此模式通过高德官方地图 JavaScript API 2.0 加载地质图。请填入<a href="https://console.amap.com/dev/key/app" target="_blank" rel="noopener">高德开放平台</a>为该网站域名申请的 Web端（JS API）Key。<br><strong>注意：</strong>GitHub Pages 是纯静态托管，此处输入安全密钥可能暴露在浏览器网络请求中。仅建议个人测试；公开长期部署请使用官方推荐的服务端代理方式保护安全密钥。</p><div class="field"><label>Web端（JS API）Key</label><input id="key" required autocomplete="off" placeholder="输入高德JS API Key"></div><div class="field"><label>JS API 安全密钥（securityJsCode）</label><input id="security" required autocomplete="off" placeholder="输入对应安全密钥"></div><div class="line"><button type="submit">加载高德地图</button><a href="./index.html" style="margin-left:auto">返回免配置版</a></div><p id="err"></p></form></div>
+<script>
+let map,layer,defaultTiles,satellite,roadNet,markers=[];
+const B=[115.0052382452605,29.997288491152855,116.0051702171812,30.664436451810023];
+const P=[['大新屋组公路剖面底部',[115.9508018,30.3389519]],['陆坪采石场',[115.9616379,30.3159882]]];
+document.getElementById('keyform').addEventListener('submit',e=>{e.preventDefault();document.getElementById('err').textContent='正在连接高德地图……';window._AMapSecurityConfig={securityJsCode:document.getElementById('security').value.trim()};const key=document.getElementById('key').value.trim();if(!key)return;const sc=document.createElement('script');sc.src='https://webapi.amap.com/maps?v=2.0&key='+encodeURIComponent(key);sc.onload=init;sc.onerror=()=>document.getElementById('err').textContent='未能加载高德API。请确认网络、域名白名单和 Key/安全密钥。';document.head.appendChild(sc)});
+function init(){try{
+ const A=window.AMap;
+ defaultTiles=A.createDefaultLayer();map=new A.Map('map',{center:P[0][1],zoom:11,viewMode:'2D',layers:[defaultTiles]});
+ layer=new A.ImageLayer({url:'./assets/H5014_GCJ02_highres.webp',bounds:new A.Bounds([B[0],B[1]],[B[2],B[3]]),opacity:.65,zIndex:20,zooms:[3,20]});map.add(layer);
+ satellite=new A.TileLayer.Satellite();roadNet=new A.TileLayer.RoadNet();
+ for(const p of P){const m=new A.Marker({position:p[1],title:p[0],label:{content:p[0],direction:'top'},map});markers.push(m)}
+ document.getElementById('road').onclick=()=>{map.setLayers([defaultTiles,layer])};
+ document.getElementById('sat').onclick=()=>{map.setLayers([satellite,roadNet,layer])};
+ document.getElementById('fit').onclick=()=>map.setBounds(new A.Bounds([B[0],B[1]],[B[2],B[3]]),false,[40,40,40,40]);
+ document.getElementById('opacity').oninput=e=>{layer.setOpacity(Number(e.target.value)/100);document.getElementById('label').textContent=e.target.value+'%'};
+ document.getElementById('legend').onclick=()=>window.open('./assets/H5014_legend.webp','_blank');
+ document.getElementById('daxinwu').onclick=()=>map.setZoomAndCenter(13,P[0][1]);
+ document.getElementById('luiping').onclick=()=>map.setZoomAndCenter(13,P[1][1]);
+ document.getElementById('setup').classList.add('hidden');document.getElementById('ui').classList.remove('hidden');
+ }catch(err){document.getElementById('err').textContent='地图初始化失败：'+err.message}}
+</script></body></html>
