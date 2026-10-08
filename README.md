@@ -1,32 +1,32 @@
-# H5014 蕲春幅地质图 · 高德地图叠加
+# H5014 蕲春幅 · 高德地质地图
 
-本仓库用于野外地质采样规划。网页将高分辨率 H5014.TIF 图幅处理后的 WebP 瓦片叠加到高德标准图或卫星图上。
+基于高分辨率 **H5014.TIF** （1:20万蕲春幅）制作，参考 [黄麦岭采样地图](https://yuhuiwang91-coder.github.io/Huangmailing-Field-Map/) 的操作方式。
 
-## 当前安装状态
-
-已添加地图网页 `index.html` 及自动解压工作流。**高清图片资源必须另外上传**，否则地图网页会缺少地质图及图例。
-
-### 上传高清资源（只需一个 ZIP）
-
-1. 从 ChatGPT 下载 `H5014_HighRes_Gaode_GitHub_Pages.zip`（约 15.6 MB），**保持原文件名，不必解压**。
-2. 打开 [上传页面](https://github.com/yuhuiwang91-coder/H5014-Gaode-Geological-Map/upload/main)，上传该 ZIP 文件，提交到 `main` 分支。
-3. [GitHub Actions](https://github.com/yuhuiwang91-coder/H5014-Gaode-Geological-Map/actions) 会自动检查 ZIP 并解压，将完整网页、图例和高清瓦片写入仓库，随后删除已上传的 ZIP。
-4. 验证仓库存在 `assets/tiles/` 中的瓦片、`assets/H5014_legend.webp` 和 `assets/H5014_GCJ02_overview.webp`。
-
-### 开启 GitHub Pages
-
-打开仓库 Settings → Pages → Build and deployment → Source 选择 **Deploy from a branch**，Branch 选 **main**、**/(root)**，保存。
-
-待部署完成后可访问：
+## 在线地址
 
 https://yuhuiwang91-coder.github.io/H5014-Gaode-Geological-Map/
 
-## 主要功能
+如果显示 404，请在本仓库 **Settings → Pages** 中，将 Source 设为 **Deploy from a branch**，Branch 选择 **main / (root)**。页面部署/缓存刷新可能需要几分钟。
 
-- 标准/卫星底图切换
-- 高清地质图层、透明度调整、坐标微调
-- 采样点高德导航、位置定位
-- 原版图例、整幅地质图查看
-- 大新屋组公路剖面、陆坪采石场标注
+## 功能
 
-地图底图由高德瓦片地址加载，可能因网络或服务策略而不可用。配准采用原图图框与 WGS84→GCJ-02 近似转换，尚未经地面控制点精确验证；野外实地位置仍需核验。
+- 手机及桌面浏览地质图，标准底图/卫星影像切换，GPS 定位
+- 透明度调整，原始地层填色和符号，以高清地图瓦片展示
+- 点击 **完整图幅**，在网页里查看整幅原始地质图和完整图例，可缩放、拖动、浏览器单独打开
+- 图层/搜索/属性/样点/说明 5 个栏目
+- 预设大新屋组公路剖面底部、陆坪采石场坐标，并支持高德导航
+- 按地图中心新增自采点，保存在当前浏览器，支持 CSV/GeoJSON 导出
+
+## 文件
+
+`index.html` 网页入口；`styles.css` 响应式样式；`app-extra.js` 完整图幅、地图工具及样点交互；`assets/` 下存放原图、图例、地理配准概览和30张高清瓦片。
+
+**图幅不能打开时：** 请确认 `assets/H5014_original_full.webp`（约6.2 MB）、`assets/H5014_legend.webp`、`assets/H5014_GCJ02_overview.webp` 均存在于仓库根目录的 `assets/` 文件夹。原始上传的 `H5014_HighRes_Gaode_GitHub_Pages/` 子目录仅为备份，请从仓库根目录 `index.html` 访问网站。
+
+## 采样坐标说明
+
+Prave et al. (2018) 第168页给出大新屋组公路剖面底部原始坐标（假定 WGS84）：30.341600°N, 115.945800°E。网页的高德叠加坐标为近似 GCJ-02。原始图框地理校正尚未经过控制点实测验证。
+
+**导出的 GeoJSON 坐标为 GCJ-02，并非通用 GIS 默认的 WGS84。** 科研 GIS 分析前请按相应基准转换。地质图为栅格，不具备地层属性的矢量查询功能。
+
+高德在线瓦片依赖可用的网络及相关服务，如底图加载异常可改用其他网络或配置高德官方 API。
