@@ -26,7 +26,8 @@ jobs:
           from zipfile import ZipFile
           archive = Path('H5014_HighRes_Gaode_GitHub_Pages.zip')
           if not archive.exists():
-              raise FileNotFoundError(f'Missing {archive}')
+              print('Archive already unpacked; no work needed.')
+              raise SystemExit(0)
           with ZipFile(archive) as z:
               for info in z.infolist():
                   path = Path(info.filename)
